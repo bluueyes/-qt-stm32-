@@ -30,7 +30,7 @@ private slots:
     void readSerialData();             // 读取串口数据
     void on_btnSetFan_clicked();       // 设置风扇转速
     void on_btnSave_clicked();         // 保存数据
-
+    void on_btnAuto_clicked();
 
 private:
     Ui::MainWindow *ui;
@@ -47,5 +47,6 @@ private:
     void initChart();                  // 初始化图表
     void updateChart();      // 更新图表
     void saveToCSV(float temp, float hum); // 保存数据
+    void SetFinData(uint8_t value);
 };
 #endif // MAINWINDOW_H

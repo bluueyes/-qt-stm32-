@@ -720,6 +720,16 @@
               <FileType>5</FileType>
               <FilePath>.\Hardware\dht11.h</FilePath>
             </File>
+            <File>
+              <FileName>fan_controller.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\Hardware\fan_controller.h</FilePath>
+            </File>
+            <File>
+              <FileName>fan_controller.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\Hardware\fan_controller.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>

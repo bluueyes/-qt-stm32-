@@ -6,6 +6,7 @@ MainWindow::MainWindow(QWidget *parent)
     , ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
+    //分界线
     ui->splite->setFixedWidth(2); // 宽度为 2px（垂直分界线）
     ui->splite->setStyleSheet("background-color: #CCCCCC;"); // 颜色
 
@@ -112,6 +113,7 @@ QString humidityString;
 QList<QPair<float, float>> sensorDataHistory;  // 可选：用于存储历史数据
 float value =0;
 float value2 =0;
+int speeds=0;
 // 读取串口数据
 void MainWindow::readSerialData() {
     static QByteArray buffer;
@@ -127,6 +129,7 @@ void MainWindow::readSerialData() {
         if (str.startsWith("T:")) {
             bool parseSuccess = false;
             float temp = 0, hum = 0;
+            uint8_t speed;
 
             // 更健壮的解析逻辑
             QStringList parts = str.split(",");
@@ -143,6 +146,16 @@ void MainWindow::readSerialData() {
                     QString humPart = parts[1].trimmed();
                     hum = humPart.mid(2).replace("%", "").trimmed().toFloat(&parseSuccess);
                     value2 = hum;
+                }
+
+                //解析转速
+                if (parseSuccess && parts[2].startsWith(" V:")) {
+                    QString speedPart = parts[2].trimmed();
+                    speed = speedPart.mid(2).toInt(&parseSuccess);
+                    if(speed!=speeds){
+                        speeds=speed;
+                        SetFinData(speed);
+                    }
                 }
             }
 
@@ -178,9 +191,10 @@ void MainWindow::on_btnSetFan_clicked() {
         return;
     }
 
-    int speed = ui->spinFanSpeed->value();
-    QString cmd = QString("SET_FAN:%1\n").arg(speed);
-    serialPort->write(cmd.toUtf8());
+
+    uint16_t speed = ui->spinFanSpeed->value();
+
+    serialPort->write((char*)(&speed));
 }
 
 // 保存数据到CSV
@@ -197,6 +211,17 @@ void MainWindow::saveToCSV(float temp, float hum) {
 void MainWindow::on_btnSave_clicked(){
     // 实现保存逻辑（即使暂时留空）
     qDebug() << "Save button clicked";
+}
+
+void MainWindow::on_btnAuto_clicked()
+{
+    if (!serialPort->isOpen()) {
+        QMessageBox::warning(this, "警告", "请先连接串口！");
+        return;
+    }
+
+    uint16_t speed = 101;
+    serialPort->write((char*)(&speed));
 }
 
 void MainWindow::updateChart() {
@@ -224,6 +249,12 @@ void MainWindow::updateChart() {
     chart2->axisX()->setRange(currentTime.addSecs(-30), currentTime);
     chart2->axisY()->setRange(20, 80); // 固定Y轴范围
 
+}
+
+void MainWindow::SetFinData(uint8_t value){
+
+    printf("%d",value);
+    ui->spinFanSpeed->setValue(value);
 }
 
 MainWindow::~MainWindow()

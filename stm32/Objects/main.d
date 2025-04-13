@@ -33,3 +33,4 @@
 .\objects\main.o: .\Hardware\Serial.h
 .\objects\main.o: D:\Keil5\ARM\ARMCC\Bin\..\include\stdio.h
 .\objects\main.o: D:\Keil5\ARM\ARMCC\Bin\..\include\string.h
+.\objects\main.o: .\Hardware\fan_controller.h

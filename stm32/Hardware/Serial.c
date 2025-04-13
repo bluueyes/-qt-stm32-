@@ -3,9 +3,12 @@
 #include <stdarg.h>
 #include <string.h>
 #include <stm32f10x_usart.h>
+#include "Serial.h"
 
 uint8_t Serial_TxPacket[4];				//FF 01 02 03 04 FE
 uint8_t Serial_RxPacket[4];
+
+uint8_t Serial_RxData;
 uint8_t Serial_RxFlag;
 
 void Serial_Init(void)
@@ -45,6 +48,9 @@ void Serial_Init(void)
 	NVIC_Init(&NVIC_InitStructure);
 	
 	USART_Cmd(USART1, ENABLE);
+	
+	Serial_RxData=101;
+	Serial_RxFlag=0;
 }
 
 void Serial_SendByte(uint8_t Byte)
@@ -120,62 +126,36 @@ void Serial_SendPacket(void)
 
 uint8_t Serial_GetRxFlag(void)
 {
-	if (Serial_RxFlag == 1)
-	{
-		Serial_RxFlag = 0;
+	if(Serial_RxFlag == 1 && Serial_RxData<100){
+		//Serial_RxFlag = 0;
 		return 1;
 	}
+	Serial_RxFlag=0;
 	return 0;
 }
 
-char USART_ReceiveString[50];													//接收PC端发送过来的字符
-int Receive_Flag = 0;															//接收消息标志位
-int Receive_sum = 0;															//数组下标
+
+/**
+  * 函    数：USART1中断函数
+  * 参    数：无
+  * 返 回 值：无
+  * 注意事项：此函数为中断函数，无需调用，中断触发后自动执行
+  *           函数名为预留的指定名称，可以从启动文件复制
+  *           请确保函数名正确，不能有任何差异，否则中断函数将不能进入
+  */
 void USART1_IRQHandler(void)
 {
-	if(USART_GetITStatus(USART1,USART_IT_RXNE) == 1)							//USART_FLAG_RXNE判断数据，== 1则有数据
+	if (USART_GetITStatus(USART1, USART_IT_RXNE) == SET)		//判断是否是USART1的接收事件触发的中断
 	{
-		if(Receive_sum > 49)													//数组能存放50个字节的数据				
-		{
-			USART_ReceiveString[49] = '\0';										//数据字节超过50位时，将最后一位设置为\0	
-			Receive_Flag = 1;													//接收标志位置1，停止接收数据
-			Receive_sum = 0;													//数组下标置0
-		}
-		
-		if(Receive_Flag == 0)													//接收标志位等于0，开始接收数据
-		{
-			USART_ReceiveString[Receive_sum] = USART_ReceiveData(USART1);		//通过USART1串口接收字符
-			Receive_sum++;														//数组下标++
-		}
-		
-		if(Receive_sum >= 2)													//数组下标大于2
-		{
-			if(USART_ReceiveString[Receive_sum-2] == '\r' && USART_ReceiveString[Receive_sum-1] == '\n' )
-			{
-				USART_ReceiveString[Receive_sum-1] = '\0';						
-				USART_ReceiveString[Receive_sum-2] = '\0';
-				Receive_Flag = 1;												//接收标志位置1，停止接收数据
-				Receive_sum = 0;												//数组下标置0
-				printf("%s\r\n",USART_ReceiveString);					
-
-				if(strcmp(USART_ReceiveString,"hello") == 0)
-				{
-					GPIO_WriteBit(GPIOA, GPIO_Pin_9, (BitAction)(1 - GPIO_ReadOutputDataBit(GPIOA, GPIO_Pin_9))); // 翻转PA9
-				}
-				if(strcmp(USART_ReceiveString,"world") == 0)
-				{
-					GPIO_WriteBit(GPIOA, GPIO_Pin_10, (BitAction)(1 - GPIO_ReadOutputDataBit(GPIOA, GPIO_Pin_10))); // 翻转PA10
-				}
-				if(strcmp(USART_ReceiveString,"jiajia") == 0)
-				{
-					GPIO_WriteBit(GPIOA, GPIO_Pin_13, (BitAction)(1 - GPIO_ReadOutputDataBit(GPIOA, GPIO_Pin_13))); // 翻转PA13
-				}
-				if(strcmp(USART_ReceiveString,"haha") == 0)
-				{
-					GPIO_WriteBit(GPIOA, GPIO_Pin_14, (BitAction)(1 - GPIO_ReadOutputDataBit(GPIOA, GPIO_Pin_14))); // 翻转PA14
-				}
-			}		
-		}
-		USART_ClearITPendingBit(USART1,USART_IT_RXNE);							//接收后先清空标志位
+		Serial_RxData = USART_ReceiveData(USART1);				//读取数据寄存器，存放在接收的数据变量
+		Serial_RxFlag = 1;										//置接收标志位变量为1
+		USART_ClearITPendingBit(USART1, USART_IT_RXNE);			//清除USART1的RXNE标志位
+																//读取数据寄存器会自动清除此标志位
+																//如果已经读取了数据寄存器，也可以不执行此代码
 	}
+}
+
+uint8_t Serial_GetRxData(void){
+	
+	return Serial_RxData;
 }

@@ -31,3 +31,4 @@
 .\objects\serial.o: D:\Keil5\ARM\ARMCC\Bin\..\include\stdio.h
 .\objects\serial.o: D:\Keil5\ARM\ARMCC\Bin\..\include\stdarg.h
 .\objects\serial.o: D:\Keil5\ARM\ARMCC\Bin\..\include\string.h
+.\objects\serial.o: Hardware\Serial.h

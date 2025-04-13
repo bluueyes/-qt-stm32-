@@ -44,7 +44,10 @@ public:
     QGridLayout *gridLayout_2;
     QLabel *label_3;
     QSpinBox *spinFanSpeed;
+    QWidget *widget_5;
+    QHBoxLayout *horizontalLayout_2;
     QPushButton *btnSetFan;
+    QPushButton *btnAuto;
     QSpacerItem *verticalSpacer;
     QPushButton *btnSave;
     QWidget *splite;
@@ -71,7 +74,6 @@ public:
         widget->setMaximumSize(QSize(200, 16777215));
         verticalLayout = new QVBoxLayout(widget);
         verticalLayout->setObjectName("verticalLayout");
-        verticalLayout->setContentsMargins(2, 2, 2, 2);
         widget_3 = new QWidget(widget);
         widget_3->setObjectName("widget_3");
         gridLayout = new QGridLayout(widget_3);
@@ -136,10 +138,28 @@ public:
 
         verticalLayout->addWidget(widget_4);
 
-        btnSetFan = new QPushButton(widget);
+        widget_5 = new QWidget(widget);
+        widget_5->setObjectName("widget_5");
+        horizontalLayout_2 = new QHBoxLayout(widget_5);
+        horizontalLayout_2->setSpacing(2);
+        horizontalLayout_2->setObjectName("horizontalLayout_2");
+        horizontalLayout_2->setContentsMargins(0, 0, 0, -1);
+        btnSetFan = new QPushButton(widget_5);
         btnSetFan->setObjectName("btnSetFan");
+        QFont font;
+        font.setPointSize(8);
+        btnSetFan->setFont(font);
 
-        verticalLayout->addWidget(btnSetFan);
+        horizontalLayout_2->addWidget(btnSetFan);
+
+        btnAuto = new QPushButton(widget_5);
+        btnAuto->setObjectName("btnAuto");
+        btnAuto->setFont(font);
+
+        horizontalLayout_2->addWidget(btnAuto);
+
+
+        verticalLayout->addWidget(widget_5);
 
         verticalSpacer = new QSpacerItem(20, 40, QSizePolicy::Policy::Minimum, QSizePolicy::Policy::Expanding);
 
@@ -217,7 +237,8 @@ public:
 
         btnConnect->setText(QCoreApplication::translate("MainWindow", "\350\277\236\346\216\245", nullptr));
         label_3->setText(QCoreApplication::translate("MainWindow", "\351\243\216\346\211\207\350\275\254\351\200\237:", nullptr));
-        btnSetFan->setText(QCoreApplication::translate("MainWindow", "\350\256\276\347\275\256", nullptr));
+        btnSetFan->setText(QCoreApplication::translate("MainWindow", "\350\256\276\347\275\256\350\275\254\351\200\237", nullptr));
+        btnAuto->setText(QCoreApplication::translate("MainWindow", "\350\207\252\345\212\250\350\260\203\350\212\202", nullptr));
         btnSave->setText(QCoreApplication::translate("MainWindow", "\344\277\235\345\255\230\346\225\260\346\215\256", nullptr));
         labelTemp->setText(QCoreApplication::translate("MainWindow", "\346\270\251\345\272\246", nullptr));
         labelHum->setText(QCoreApplication::translate("MainWindow", "\346\271\277\345\272\246", nullptr));
